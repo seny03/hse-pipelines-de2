@@ -66,6 +66,9 @@ object SessionAnalyzer {
       val line = lines(i)
 
       if (line.startsWith("QS ")) {
+        val parts = line.split("\\s+", 3)
+        if (parts.length < 2 || parseDate(parts(1)).isEmpty)
+          log.warn(s"Unrecognized QS timestamp: ${parts.lift(1).getOrElse("")}")
 
         i += 1
 
