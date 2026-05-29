@@ -2,10 +2,14 @@ package ru.hse.de2
 
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.SparkSession
+import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
+import scala.util.{Failure, Success, Try}
 
 object SessionAnalyzer {
+
+  private val log = LoggerFactory.getLogger(getClass)
 
   private val DatePattern1 = """(\d{2})\.(\d{2})\.(\d{4})_.*""".r
   private val DatePattern2 = """\w+,_(\d+)_(\w+)_(\d{4})_.*""".r
@@ -150,7 +154,14 @@ object SessionAnalyzer {
 
     val parsed = sc
       .wholeTextFiles(dataPath)
-      .map { case (_, content) => parseSession(content) }
+      .flatMap { case (path, content) =>
+        Try(parseSession(content)) match {
+          case Success(result) => Some(result)
+          case Failure(e) =>
+            log.warn(s"Failed to parse session file $path: ${e.getMessage}")
+            None
+        }
+      }
       .cache()
 
     // Task 1: Count CARD_SEARCH result lists that contain ACC_45616.
