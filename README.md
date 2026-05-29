@@ -283,4 +283,3 @@ val qsDocOpenCounts = parsed
 output/task1_card_search_acc45616/
 output/task2_qs_doc_opens_per_day/
 ```
-hse
