@@ -167,6 +167,17 @@ object SessionAnalyzer {
       }
       .cache()
 
+    parsed
+      .flatMap { case (cardSearchResults, _) => cardSearchResults }
+      .map(_.mkString(","))
+      .saveAsTextFile(s"$outputPath/parsed_card_search_results")
+    
+    parsed
+      .flatMap { case (_, docOpens) => docOpens }
+      .map { case (date, docId) => s"$date\t$docId" }
+      .saveAsTextFile(s"$outputPath/parsed_qs_doc_opens")
+
+
     // Task 1: Count CARD_SEARCH result lists that contain ACC_45616.
     val cardSearchCount = parsed
       .flatMap { case (cardSearchResults, _) => cardSearchResults }
